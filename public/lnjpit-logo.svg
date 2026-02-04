@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LNJPIT logo placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#3b0d6d"/>
+      <stop offset="1" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="124" fill="#ffffff" stroke="#3b0d6d" stroke-width="8"/>
+  <circle cx="128" cy="128" r="92" fill="url(#g)" opacity="0.1"/>
+  <g fill="#3b0d6d">
+    <path d="M128 64a64 64 0 100 128 64 64 0 000-128zm0 12a52 52 0 110 104 52 52 0 010-104z"/>
+    <path d="M84 128h88v8H84z"/>
+    <path d="M124 92h8v72h-8z"/>
+  </g>
+  <text x="128" y="232" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#3b0d6d">LNJPIT</text>
+</svg>

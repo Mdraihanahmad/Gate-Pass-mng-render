@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <title>Gate Pass & Security</title>
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('theme') || 'system';
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = t === 'dark' || (t === 'system' && prefersDark);
+          if (dark) document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+    <script>
+      (function(){
+        try {
+          var api = (window && window.__VITE_API_BASE__) || (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE);
+          if (api && /^https?:\/\//.test(api)) {
+            var l1 = document.createElement('link'); l1.rel='preconnect'; l1.href=api; l1.crossOrigin=''; document.head.appendChild(l1);
+            var l2 = document.createElement('link'); l2.rel='dns-prefetch'; l2.href=api; document.head.appendChild(l2);
+          }
+        } catch(e){}
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-Dq5N61t0.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-CFsy__N8.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-router-CySAd55F.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-axios-NIGUFBhG.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-DxUJAirC.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-95V009E5.css">
+  <link rel="manifest" href="/manifest.webmanifest"></head>
+  <body>
+    <div id="root"></div>
+  <meta name="theme-color" content="#111827" />
+  </body>
+  </html>
