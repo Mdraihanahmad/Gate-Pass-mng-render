@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: gatepass-app
+    env: node
+    plan: free
+    buildCommand: npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend
+    startCommand: npm start --prefix backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Set these in the Render dashboard (recommended) if you don't want them stored here:
+      # - key: MONGODB_URI
+      #   value: <your-mongodb-connection-string>
+      # - key: MONGODB_DBNAME
+      #   value: gatepass
+      # - key: JWT_SECRET
+      #   value: <your-secret>
+      # - key: CLOUDINARY_CLOUD_NAME
+      #   value: <your-cloud>
+      # - key: CLOUDINARY_API_KEY
+      #   value: <your-key>
+      # - key: CLOUDINARY_API_SECRET
+      #   value: <your-secret>
+      # Optional tuning:
+      # - key: OVERSTAY_HOURS
+      #   value: "6"
+      # - key: OVERSTAY_LOOKBACK_HR
+      #   value: "72"
