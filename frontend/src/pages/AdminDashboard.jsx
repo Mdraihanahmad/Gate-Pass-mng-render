@@ -906,7 +906,14 @@ export default function AdminDashboard() {
             <input type="datetime-local" className="input" value={date.to} onChange={(e) => setDate({ ...date, to: e.target.value })} />
           </div>
           <div className="flex gap-2">
-            <GradientButton color="teal" disabled={loadingMain} onClick={load} icon={<FilterIcon className="h-4 w-4" />}>{loadingMain ? 'Loading…' : 'Filter'}</GradientButton>
+            <GradientButton
+              color="teal"
+              disabled={loadingMain}
+              onClick={() => loadLogsTab({ force: true, showLoading: true })}
+              icon={<FilterIcon className="h-4 w-4" />}
+            >
+              {loadingMain ? 'Loading…' : 'Filter'}
+            </GradientButton>
             <GradientButton color="indigo" disabled={loadingMain} onClick={() => exportFile('pdf', 'students')} icon={<DownloadIcon className="h-4 w-4" />}>PDF</GradientButton>
             <GradientButton color="indigo" variant="outline" disabled={loadingMain} onClick={() => exportFile('docx', 'students')} icon={<DownloadIcon className="h-4 w-4" />}>DOCX</GradientButton>
           </div>
