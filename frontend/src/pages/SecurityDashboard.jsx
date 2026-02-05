@@ -102,15 +102,18 @@ export default function SecurityDashboard() {
   const renderManualEntryForm = ({ showHeading = true, heading = 'Manual Entry', className = '' } = {}) => (
     <div className={`space-y-2 ${className}`}>
       {showHeading && <div className="font-semibold">{heading}</div>}
-      <form className="flex flex-col lg:flex-row gap-2 lg:items-end" onSubmit={submitManual}>
+      <form className="flex flex-col lg:flex-row gap-2 lg:items-end" onSubmit={submitManual} noValidate>
         <input
           className="input"
           placeholder="6-digit PIN"
           inputMode="numeric"
-          pattern="\\d*"
           autoComplete="one-time-code"
+          maxLength={6}
           value={manual.pinCode}
-          onChange={(e) => setManual({ ...manual, pinCode: e.target.value })}
+          onChange={(e) => {
+            const next = String(e.target.value || '').replace(/\D/g, '').slice(0, 6);
+            setManual({ ...manual, pinCode: next });
+          }}
         />
         <div className="flex flex-col min-w-[200px] lg:min-w-[230px]">
           <span className="text-[11px] uppercase tracking-wide text-gray-400 mb-1 hidden lg:inline">Action</span>
