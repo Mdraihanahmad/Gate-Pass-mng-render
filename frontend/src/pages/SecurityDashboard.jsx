@@ -46,7 +46,7 @@ function GradientButton({ children, color='teal', variant='solid', size='sm', ic
 export default function SecurityDashboard() {
   const [logs, setLogs] = useState([]);
   const [date, setDate] = useState({ from: '', to: '' });
-  const [manual, setManual] = useState({ pinCode: '', sid: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
+  const [manual, setManual] = useState({ pinCode: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
   const [notice, setNotice] = useState('');
   const [noticeType, setNoticeType] = useState('success');
   const [noticeDuration, setNoticeDuration] = useState(2000);
@@ -101,8 +101,7 @@ export default function SecurityDashboard() {
     <div className={`space-y-2 ${className}`}>
       {showHeading && <div className="font-semibold">{heading}</div>}
       <form className="flex flex-col lg:flex-row gap-2 lg:items-end" onSubmit={submitManual}>
-        <input className="input" placeholder="QR sid (optional)" value={manual.sid} onChange={(e) => setManual({ ...manual, sid: e.target.value })} />
-        <input className="input" placeholder="6-digit PIN (optional)" value={manual.pinCode} onChange={(e) => setManual({ ...manual, pinCode: e.target.value })} />
+        <input className="input" placeholder="6-digit PIN" value={manual.pinCode} onChange={(e) => setManual({ ...manual, pinCode: e.target.value })} />
         <div className="flex flex-col min-w-[200px] lg:min-w-[230px]">
           <span className="text-[11px] uppercase tracking-wide text-gray-400 mb-1 hidden lg:inline">Action</span>
           <div className="flex gap-2">
@@ -496,6 +495,13 @@ export default function SecurityDashboard() {
 
   const submitManual = async (e) => {
     e.preventDefault();
+    const pin = (manual.pinCode || '').trim();
+    if (!/^\d{6}$/.test(pin)) {
+      setNotice('Enter a valid 6-digit PIN');
+      setNoticeType('error');
+      playErrorHaptics();
+      return;
+    }
     const payload = { ...manual };
     if (manual.action === 'check-out') {
       payload.purpose = manual.purpose === 'other' ? manual.otherPurpose : manual.purpose;
@@ -511,14 +517,8 @@ export default function SecurityDashboard() {
         setNotice('Queued manual log — will sync when online');
         setNoticeType('success');
         try {
-          const sid = (manual.sid || '').trim();
-          const pin = (manual.pinCode || '').trim();
           let cached = null;
-          if (sid) {
-            cached = await offline.getStudentBySid(sid);
-          } else if (/^\d{6}$/.test(pin)) {
-            cached = await offline.getStudentByPin(pin);
-          }
+          cached = await offline.getStudentByPin(pin);
           if (cached) {
             const p = manual.action === 'check-out'
               ? (manual.purpose === 'other' ? (manual.otherPurpose || 'Other') : manual.purpose)
@@ -539,7 +539,7 @@ export default function SecurityDashboard() {
             playSuccessHaptics();
           }
         } catch {}
-        setManual({ pinCode: '', sid: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
+        setManual({ pinCode: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
         return;
       }
 
@@ -550,7 +550,7 @@ export default function SecurityDashboard() {
         await offline.queueAction({ type: 'manual', payload: { ...payload, clientTimestamp } });
         setNotice('Queued manual log — will sync when online');
         setNoticeType('success');
-        setManual({ pinCode: '', sid: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
+        setManual({ pinCode: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
         return;
       }
       if (res && res.status === 403) {
@@ -559,9 +559,8 @@ export default function SecurityDashboard() {
         return;
       }
       if (res.status === 404) {
-        const sid = payload.sid || '';
         const pin = payload.pinCode || '';
-        setBanMeta({ reason: 'Deleted/Banned ID', sid, pin });
+        setBanMeta({ reason: 'Deleted/Banned ID', sid: '', pin });
         setBanOpen(true);
         setNotice('Log blocked: deleted/banned ID');
         setNoticeType('error');
@@ -595,7 +594,7 @@ export default function SecurityDashboard() {
       }
       setNotice(`Logged (${manual.action})`);
       setNoticeType('success');
-      setManual({ pinCode: '', sid: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
+      setManual({ pinCode: '', action: 'check-in', purpose: 'fooding', otherPurpose: '' });
       await load();
     } catch (err) {
       setNotice(err?.response?.data?.message || 'Failed to log');
