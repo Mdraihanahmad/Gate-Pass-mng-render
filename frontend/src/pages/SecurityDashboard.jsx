@@ -97,11 +97,21 @@ export default function SecurityDashboard() {
   const lastScanRef = useRef({ text: '', t: 0 });
   const [scanToast, setScanToast] = useState(null); // { action, name, registrationNo, time, queued?: boolean }
 
-  const ManualEntryForm = ({ showHeading = true, heading = 'Manual Entry', className = '' } = {}) => (
+  // NOTE: This is intentionally a render helper (not a React component) to avoid remounting
+  // the subtree on each keystroke, which can cause mobile keyboards/caret to dismiss.
+  const renderManualEntryForm = ({ showHeading = true, heading = 'Manual Entry', className = '' } = {}) => (
     <div className={`space-y-2 ${className}`}>
       {showHeading && <div className="font-semibold">{heading}</div>}
       <form className="flex flex-col lg:flex-row gap-2 lg:items-end" onSubmit={submitManual}>
-        <input className="input" placeholder="6-digit PIN" value={manual.pinCode} onChange={(e) => setManual({ ...manual, pinCode: e.target.value })} />
+        <input
+          className="input"
+          placeholder="6-digit PIN"
+          inputMode="numeric"
+          pattern="\\d*"
+          autoComplete="one-time-code"
+          value={manual.pinCode}
+          onChange={(e) => setManual({ ...manual, pinCode: e.target.value })}
+        />
         <div className="flex flex-col min-w-[200px] lg:min-w-[230px]">
           <span className="text-[11px] uppercase tracking-wide text-gray-400 mb-1 hidden lg:inline">Action</span>
           <div className="flex gap-2">
@@ -1099,7 +1109,7 @@ export default function SecurityDashboard() {
       {/* Tab content */}
       {activeTab === 'manual' && (
         <div role="tabpanel" aria-label="Manual Entry" className="space-y-2">
-          <ManualEntryForm showHeading={true} />
+          {renderManualEntryForm({ showHeading: true })}
         </div>
       )}
 
@@ -1293,7 +1303,7 @@ export default function SecurityDashboard() {
               <ChevronDown className="h-5 w-5 text-gray-300 transition-transform group-open:rotate-180" />
             </summary>
             <div className="px-3 sm:px-4 pb-4">
-              <ManualEntryForm showHeading={false} className="pt-1" />
+              {renderManualEntryForm({ showHeading: false, className: 'pt-1' })}
             </div>
           </details>
 
