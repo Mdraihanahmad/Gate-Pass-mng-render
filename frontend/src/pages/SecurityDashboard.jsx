@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X as XIcon, Settings as SettingsIcon, LogIn as LogInIcon, LogOut as LogOutIcon, UtensilsCrossed, ShoppingCart, Pill, Home as HomeIcon, MoreHorizontal, Download as DownloadIcon, Filter as FilterIcon, RefreshCw as RefreshIcon, Camera as CameraIcon, UserPlus2 as UserPlusIcon, LogOut as ExitIcon, List as ListIcon, Users as UsersIcon, Edit3 as EditIcon, Package as PackageIcon } from 'lucide-react';
+import { X as XIcon, Settings as SettingsIcon, LogIn as LogInIcon, LogOut as LogOutIcon, UtensilsCrossed, ShoppingCart, Pill, Home as HomeIcon, MoreHorizontal, Download as DownloadIcon, Filter as FilterIcon, RefreshCw as RefreshIcon, Camera as CameraIcon, UserPlus2 as UserPlusIcon, LogOut as ExitIcon, List as ListIcon, Users as UsersIcon, Edit3 as EditIcon, Package as PackageIcon, ChevronDown } from 'lucide-react';
 import DataTable from '../components/DataTable';
 import { offline } from '../services/offline';
 import { api } from '../services/api';
@@ -96,6 +96,58 @@ export default function SecurityDashboard() {
   const [torchOn, setTorchOn] = useState(false);
   const lastScanRef = useRef({ text: '', t: 0 });
   const [scanToast, setScanToast] = useState(null); // { action, name, registrationNo, time, queued?: boolean }
+
+  const ManualEntryForm = ({ showHeading = true, heading = 'Manual Entry', className = '' } = {}) => (
+    <div className={`space-y-2 ${className}`}>
+      {showHeading && <div className="font-semibold">{heading}</div>}
+      <form className="flex flex-col lg:flex-row gap-2 lg:items-end" onSubmit={submitManual}>
+        <input className="input" placeholder="QR sid (optional)" value={manual.sid} onChange={(e) => setManual({ ...manual, sid: e.target.value })} />
+        <input className="input" placeholder="6-digit PIN (optional)" value={manual.pinCode} onChange={(e) => setManual({ ...manual, pinCode: e.target.value })} />
+        <div className="flex flex-col min-w-[200px] lg:min-w-[230px]">
+          <span className="text-[11px] uppercase tracking-wide text-gray-400 mb-1 hidden lg:inline">Action</span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setManual({ ...manual, action: 'check-in' })}
+              aria-pressed={manual.action==='check-in'}
+              className={`relative inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] lg:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-gray-900 transition-colors ${manual.action==='check-in'
+                ? 'text-white bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 border border-transparent shadow-sm'
+                : 'text-cyan-300 bg-slate-800/40 hover:bg-slate-700/50 border border-cyan-500/30'} `}
+            >
+              {manual.action==='check-in' && <span className="absolute inset-0 rounded-lg bg-white/10" />}
+              <LogInIcon className="h-4 w-4 relative" />
+              <span className="relative">Check&nbsp;In</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setManual({ ...manual, action: 'check-out' })}
+              aria-pressed={manual.action==='check-out'}
+              className={`relative inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] lg:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-gray-900 transition-colors ${manual.action==='check-out'
+                ? 'text-white bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 border border-transparent shadow-sm'
+                : 'text-violet-300 bg-slate-800/40 hover:bg-slate-700/50 border border-violet-500/30'} `}
+            >
+              {manual.action==='check-out' && <span className="absolute inset-0 rounded-lg bg-white/10" />}
+              <LogOutIcon className="h-4 w-4 relative" />
+              <span className="relative">Check&nbsp;Out</span>
+            </button>
+          </div>
+        </div>
+        {manual.action === 'check-out' && (
+          <div className="min-w-[260px]">
+            <PurposeSelector
+              label="Purpose"
+              value={manual.purpose}
+              onChange={(v) => setManual({ ...manual, purpose: v })}
+              otherValue={manual.otherPurpose}
+              onOtherChange={(v) => setManual({ ...manual, otherPurpose: v })}
+              layout="column"
+            />
+          </div>
+        )}
+        <GradientButton color="teal" type="submit" icon={<LogInIcon className="h-4 w-4" />}>Log</GradientButton>
+      </form>
+    </div>
+  );
 
   // Auto-hide scan toast
   useEffect(() => {
@@ -1048,53 +1100,7 @@ export default function SecurityDashboard() {
       {/* Tab content */}
       {activeTab === 'manual' && (
         <div role="tabpanel" aria-label="Manual Entry" className="space-y-2">
-          <div className="font-semibold">Manual Entry</div>
-          <form className="flex flex-col lg:flex-row gap-2 lg:items-end" onSubmit={submitManual}>
-            <input className="input" placeholder="QR sid (optional)" value={manual.sid} onChange={(e) => setManual({ ...manual, sid: e.target.value })} />
-            <input className="input" placeholder="6-digit PIN (optional)" value={manual.pinCode} onChange={(e) => setManual({ ...manual, pinCode: e.target.value })} />
-            <div className="flex flex-col min-w-[200px] lg:min-w-[230px]">
-              <span className="text-[11px] uppercase tracking-wide text-gray-400 mb-1 hidden lg:inline">Action</span>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setManual({ ...manual, action: 'check-in' })}
-                  aria-pressed={manual.action==='check-in'}
-                  className={`relative inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] lg:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-gray-900 transition-colors ${manual.action==='check-in'
-                    ? 'text-white bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 border border-transparent shadow-sm'
-                    : 'text-cyan-300 bg-slate-800/40 hover:bg-slate-700/50 border border-cyan-500/30'} `}
-                >
-                  {manual.action==='check-in' && <span className="absolute inset-0 rounded-lg bg-white/10" />}
-                  <LogInIcon className="h-4 w-4 relative" />
-                  <span className="relative">Check&nbsp;In</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setManual({ ...manual, action: 'check-out' })}
-                  aria-pressed={manual.action==='check-out'}
-                  className={`relative inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] lg:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-gray-900 transition-colors ${manual.action==='check-out'
-                    ? 'text-white bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 border border-transparent shadow-sm'
-                    : 'text-violet-300 bg-slate-800/40 hover:bg-slate-700/50 border border-violet-500/30'} `}
-                >
-                  {manual.action==='check-out' && <span className="absolute inset-0 rounded-lg bg-white/10" />}
-                  <LogOutIcon className="h-4 w-4 relative" />
-                  <span className="relative">Check&nbsp;Out</span>
-                </button>
-              </div>
-            </div>
-            {manual.action === 'check-out' && (
-              <div className="min-w-[260px]">
-                <PurposeSelector
-                  label="Purpose"
-                  value={manual.purpose}
-                  onChange={(v) => setManual({ ...manual, purpose: v })}
-                  otherValue={manual.otherPurpose}
-                  onOtherChange={(v) => setManual({ ...manual, otherPurpose: v })}
-                  layout="column"
-                />
-              </div>
-            )}
-            <GradientButton color="teal" type="submit" icon={<LogInIcon className="h-4 w-4" />}>Log</GradientButton>
-          </form>
+          <ManualEntryForm showHeading={true} />
         </div>
       )}
 
@@ -1274,6 +1280,24 @@ export default function SecurityDashboard() {
 
       {activeTab === 'students' && (
         <div role="tabpanel" aria-label="Student Logs" className="space-y-3">
+          <details className="group rounded-xl border border-white/10 bg-slate-800/30 backdrop-blur">
+            <summary className="cursor-pointer list-none select-none px-3 sm:px-4 py-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-fuchsia-500/20 border border-violet-400/20 text-violet-200">
+                  <EditIcon className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-gray-100">Manual Entry</div>
+                  <div className="text-xs text-gray-400 truncate">Check in/out using SID or PIN when QR isn’t available</div>
+                </div>
+              </div>
+              <ChevronDown className="h-5 w-5 text-gray-300 transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="px-3 sm:px-4 pb-4">
+              <ManualEntryForm showHeading={false} className="pt-1" />
+            </div>
+          </details>
+
           <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
             <div>
               <label className="text-sm">From</label>
